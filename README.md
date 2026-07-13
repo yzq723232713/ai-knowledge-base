@@ -33,20 +33,27 @@
 
 ## 项目结构
 
-\```
+```
 src/
-├── loader/       # 文档加载
-├── chunker/      # 文本切分
-├── embedder/     # 向量化
+├── models.py      # 核心数据结构 (Document/Chunk)
+├── loader/        # 文档加载 (PDF/DOCX/TXT/CSV)
+├── chunker/       # 文本切分 (递归降级+overlap)
+├── embedder/      # 向量化
 ├── retriever/    # 检索
-├── generator/    # LLM 生成
-└── api/          # FastAPI 接口
-\```
+├── generator/     # LLM 生成
+└── api/           # FastAPI 接口
+```
 
 ## 快速开始
 
-\```bash
+```bash
+# 安装依赖
 poetry install
-cp .env.example .env  # 编辑 .env 填入 DEEPSEEK_API_KEY
+
+# 配置 API Key
+cp .env.example .env
+# 编辑 .env，填入 DEEPSEEK_API_KEY
+
+# 启动服务（待 API 模块完成后可用）
 poetry run uvicorn src.api.main:app --reload
-\```
+```
