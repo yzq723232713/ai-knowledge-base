@@ -1,0 +1,8 @@
+.env
+__pycache__/
+*.pyc
+.pytest_cache/
+poetry.lock
+data/
+*.db
+chroma_db/
