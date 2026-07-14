@@ -15,7 +15,7 @@
 
 - [x] 支持 PDF / DOCX / TXT / CSV 文档加载
 - [x] 文档切块（递归降级 + overlap）
-- [ ] Embedding + 向量库存储
+- [x] Embedding + 向量库存储
 - [ ] 语义检索 + BM25 多路召回
 - [ ] Reranker 精排
 - [ ] LLM 生成回答
@@ -30,6 +30,8 @@
 | 项目骨架 + 依赖 | Day 29 | ✅ |
 | 文档加载器 (loader/) | Day 30 | ✅ |
 | 文本切分 (chunker/) | Day 31 | ✅ |
+| Embedding 模块 (embedder/) | Day 32 | ✅ |
+| 向量存储 (retriever/) | Day 33 | ✅ |
 
 ## 项目结构
 
