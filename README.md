@@ -16,8 +16,8 @@
 - [x] 支持 PDF / DOCX / TXT / CSV 文档加载
 - [x] 文档切块（递归降级 + overlap）
 - [x] Embedding + 向量库存储
-- [ ] 语义检索 + BM25 多路召回
-- [ ] Reranker 精排
+- [x] 语义检索 + BM25 多路召回
+- [x] Reranker 精排
 - [ ] LLM 生成回答
 - [ ] 多轮对话
 - [ ] 答案引用来源标注
@@ -32,6 +32,7 @@
 | 文本切分 (chunker/) | Day 31 | ✅ |
 | Embedding 模块 (embedder/) | Day 32 | ✅ |
 | 向量存储 (retriever/) | Day 33 | ✅ |
+| 检索模块 (Hybrid+Reranker) | Day 34 | ✅ |
 
 ## 项目结构
 
