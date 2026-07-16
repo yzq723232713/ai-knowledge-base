@@ -18,10 +18,10 @@
 - [x] Embedding + 向量库存储
 - [x] 语义检索 + BM25 多路召回
 - [x] Reranker 精排
-- [ ] LLM 生成回答
+- [x] LLM 生成回答
+- [x] 答案引用来源标注
+- [x] REST API
 - [ ] 多轮对话
-- [ ] 答案引用来源标注
-- [ ] REST API
 
 ## 开发进度
 
@@ -33,6 +33,9 @@
 | Embedding 模块 (embedder/) | Day 32 | ✅ |
 | 向量存储 (retriever/) | Day 33 | ✅ |
 | 检索模块 (Hybrid+Reranker) | Day 34 | ✅ |
+| 生成模块 (generator/) | Day 35 | ✅ |
+| FastAPI (api/) | Day 36 | ✅ |
+| 端到端集成 | Day 37 | ✅ |
 
 ## 项目结构
 
@@ -57,6 +60,6 @@ poetry install
 cp .env.example .env
 # 编辑 .env，填入 DEEPSEEK_API_KEY
 
-# 启动服务（待 API 模块完成后可用）
+# 启动服务
 poetry run uvicorn src.api.main:app --reload
 ```
