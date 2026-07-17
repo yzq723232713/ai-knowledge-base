@@ -36,6 +36,7 @@
 | 生成模块 (generator/) | Day 35 | ✅ |
 | FastAPI (api/) | Day 36 | ✅ |
 | 端到端集成 | Day 37 | ✅ |
+| Streamlit UI | Day 38 | ✅ |
 
 ## 项目结构
 
