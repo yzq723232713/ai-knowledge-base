@@ -1,5 +1,5 @@
 ﻿import sys
-sys.path.insert(0, "E:/ai-knowledge-base")
+sys.path.insert(0, "D:/ai-knowledge-base")
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel

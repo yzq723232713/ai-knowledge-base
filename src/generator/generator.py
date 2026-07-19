@@ -1,4 +1,4 @@
-"""生成模块：拼接 Prompt + 调用 DeepSeek LLM + 返回回答 + 引用来源"""
+﻿"""生成模块：拼接 Prompt + 调用 DeepSeek LLM + 返回回答 + 引用来源"""
 from openai import OpenAI
 import os
 from dotenv import load_dotenv

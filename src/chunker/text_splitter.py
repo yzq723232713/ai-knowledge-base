@@ -1,4 +1,4 @@
-"""文本切分器：递归降级切分"""
+﻿"""文本切分器：递归降级切分"""
 from typing import List
 from src.models import Chunk
 

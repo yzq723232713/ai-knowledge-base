@@ -37,6 +37,7 @@
 | FastAPI (api/) | Day 36 | ✅ |
 | 端到端集成 | Day 37 | ✅ |
 | Streamlit UI | Day 38 | ✅ |
+| RAGAS 评估 | Day 39 | ✅ |
 
 ## 项目结构
 

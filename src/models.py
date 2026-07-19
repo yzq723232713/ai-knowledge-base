@@ -1,4 +1,4 @@
-"""核心数据结构（贯穿整个项目的统一格式）"""
+﻿"""核心数据结构（贯穿整个项目的统一格式）"""
 from pydantic import BaseModel, Field
 from datetime import datetime
 from typing import List, Optional

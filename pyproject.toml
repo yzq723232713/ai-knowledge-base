@@ -16,7 +16,12 @@ dependencies = [
     "fastapi (>=0.139.0,<0.140.0)",
     "uvicorn[standard] (>=0.51.0,<0.52.0)",
     "python-multipart (>=0.0.32,<0.0.33)",
-    "streamlit (>=1.59.2,<2.0.0)"
+    "streamlit (>=1.59.2,<2.0.0)",
+    "ragas (>=0.4.1,<1.0.0)",
+    "langchain-openai (>=0.3.0,<1.0.0)",
+    "datasets (>=4.0.0,<5.0.0)",
+    "langchain-huggingface (>=0.1.0,<1.0.0)",
+    "openai (>=2.46.0,<3.0.0)"
 ]
 
 
@@ -28,3 +33,9 @@ build-backend = "poetry.core.masonry.api"
 dev = [
     "pytest (>=9.1.1,<10.0.0)"
 ]
+
+[[tool.poetry.source]]
+name = "tsinghua"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+priority = "primary"
+

@@ -1,4 +1,4 @@
-"""Embedding 模块：文本 → 向量
+﻿"""Embedding 模块：文本 → 向量
 
 提供两种向量化方案：
   Embedder    — 本地模型（bge-small，免费，离线，512 维）

@@ -1,6 +1,6 @@
 ﻿"""Day 37：端到端集成测试 — 全流程验证"""
 import sys
-sys.path.insert(0, "E:/ai-knowledge-base")
+sys.path.insert(0, "D:/ai-knowledge-base")
 
 from src.loader.document_loader import DocumentLoader
 from src.chunker.text_splitter import TextSplitter
@@ -23,7 +23,7 @@ def test_full_pipeline():
     generator = Generator()
 
     # Step 1-2: 加载 + 切块
-    test_files = list(Path("E:/learn/day15/test_docs").iterdir())
+    test_files = list(Path("D:/learn/day15/test_docs").iterdir())
     all_chunks = []
     for f in test_files:
         if f.suffix.lower() not in {".pdf", ".docx", ".txt", ".csv"}:

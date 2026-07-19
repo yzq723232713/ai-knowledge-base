@@ -1,4 +1,4 @@
-"""混合检索器：向量检索 + BM25 关键词检索 → RRF 融合"""
+﻿"""混合检索器：向量检索 + BM25 关键词检索 → RRF 融合"""
 from typing import List
 import numpy as np
 from rank_bm25 import BM25Okapi

@@ -1,4 +1,4 @@
-"""向量存储模块：Chroma 封装，支持元数据过滤"""
+﻿"""向量存储模块：Chroma 封装，支持元数据过滤"""
 from typing import List, Optional
 import chromadb
 from chromadb.config import Settings

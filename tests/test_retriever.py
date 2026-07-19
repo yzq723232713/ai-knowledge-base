@@ -1,4 +1,4 @@
-"""检索模块测试：向量 / BM25 / 混合 / Reranker 四层对比"""
+﻿"""检索模块测试：向量 / BM25 / 混合 / Reranker 四层对比"""
 import sys
 sys.path.insert(0, ".")
 
@@ -130,13 +130,13 @@ def test_four_way_comparison():
     print(f"\n查询: 「{query}」")
     print("  [纯向量]")
     for i, (doc, score, _) in enumerate(v, 1):
-        print(f"    {i}. [{score:.4f}] {doc[:50]}")
+        print(f"    {i}. [{scorD:.4f}] {doc[:50]}")
     print("  [BM25]")
     for i, (doc, score, _) in enumerate(b, 1):
-        print(f"    {i}. [{score:.4f}] {doc[:50]}")
+        print(f"    {i}. [{scorD:.4f}] {doc[:50]}")
     print("  [混合 RRF]")
     for i, (doc, score, _) in enumerate(h, 1):
-        print(f"    {i}. [{score:.4f}] {doc[:50]}")
+        print(f"    {i}. [{scorD:.4f}] {doc[:50]}")
     print("  [Reranker]")
     for i, (doc, score) in enumerate(r, 1):
-        print(f"    {i}. [{score:.4f}] {doc[:50]}")
+        print(f"    {i}. [{scorD:.4f}] {doc[:50]}")

@@ -1,6 +1,8 @@
 ﻿"""Day 38：Streamlit 极简 UI — 文件上传 + RAG 问答 + 引用来源"""
-import sys
-sys.path.insert(0, "E:/ai-knowledge-base")
+import sys, os
+os.environ["HF_HUB_DISABLE_IMPORT_ERROR"] = "1"
+os.environ["TRANSFORMERS_VERBOSITY"] = "fatal"
+sys.path.insert(0, "D:/ai-knowledge-base")
 
 import warnings
 warnings.filterwarnings("ignore")

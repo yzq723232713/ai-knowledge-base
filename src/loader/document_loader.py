@@ -1,4 +1,4 @@
-"""文档加载器：PDF / DOCX / TXT / CSV → Document"""
+﻿"""文档加载器：PDF / DOCX / TXT / CSV → Document"""
 from pathlib import Path
 import csv
 import fitz  # PyMuPDF
