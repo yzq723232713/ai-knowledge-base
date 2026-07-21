@@ -1,4 +1,4 @@
-﻿"""Day 38：Streamlit 极简 UI — 文件上传 + RAG 问答 + 引用来源"""
+"""Day 38：Streamlit 极简 UI — 文件上传 + RAG 问答 + 引用来源"""
 import sys, os
 os.environ["HF_HUB_DISABLE_IMPORT_ERROR"] = "1"
 os.environ["TRANSFORMERS_VERBOSITY"] = "fatal"
@@ -21,14 +21,14 @@ from src.generator.generator import Generator
 # ===== 初始化 =====
 @st.cache_resource
 def init_components():
+    store = VectorStore(collection_name="streamlit_kb")
+    embedder = Embedder()
     return {
         "loader": DocumentLoader(),
         "splitter": TextSplitter(chunk_size=300, chunk_overlap=50),
-        "embedder": Embedder(),
-        "store": VectorStore(collection_name="streamlit_kb"),
-        "hybrid": HybridRetriever(
-            Embedder(), VectorStore(collection_name="streamlit_kb")
-        ),
+        "embedder": embedder,
+        "store": store,
+        "hybrid": HybridRetriever(embedder, store),
         "reranker": Reranker(),
         "generator": Generator(),
     }
@@ -39,7 +39,6 @@ splitter = comp["splitter"]
 embedder = comp["embedder"]
 store = comp["store"]
 hybrid = comp["hybrid"]
-hybrid.store = store  # 确保 hybrid 和 store 用同一个 collection
 reranker = comp["reranker"]
 generator = comp["generator"]
 
