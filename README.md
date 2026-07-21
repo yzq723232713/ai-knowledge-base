@@ -85,6 +85,9 @@ graph LR
 | 端到端集成 | Day 37 | ✅ |
 | Streamlit UI | Day 38 | ✅ |
 | RAGAS 评估 | Day 39 | ✅ |
+| Hybrid+Reranker 接入 | Day 40 | ✅ |
+| 多轮对话 + README 完善 | Day 41 | ✅ |
+| 里程碑检验 + 项目收尾 | Day 42 | ✅ |
 
 ## 项目结构
 
