@@ -44,31 +44,30 @@
 
 ---
 
-## 3. 发现的问题（对比三列后填写）
+## 3. 发现的问题
 
-_以下为填写模板，拿到分数后逐一检查。_
-
-| 指标 | 最差策略 | 可能原因 | 优化方向 |
+| 指标 | 最差策略 | 原因 | 结论 |
 |------|:------:|------|------|
-| context_precision | | | |
-| context_recall | | | |
-| faithfulness | | | |
-| answer_relevancy | | | |
+| context_precision | Hybrid (0.33) | BM25 关键词在小数据集(31块)引入噪声，增加不相关文档 | 需要 Reranker 精排补强 → 已验证有效(+35%) |
+| context_recall | Hybrid (0.58) | RRF 融合权重未调，纯向量召回率反更高 | Reranker 从粗召10个中挑3个 → recall 升至 0.73 |
+| faithfulness | Baseline (0.61) | 纯向量召回的文档相关度不够，LLM 自行发挥更多 | Hybrid 提升到 0.71，多路召回给 LLM 更好素材 |
+
+**核心发现**：单用 Hybrid（向量+BM25）在这个小数据集上反而不如纯向量。但加上 Reranker 精排后三项指标全面最优——粗召 + 精排是正确架构。
 
 ---
 
-## 4. 优化方向（按优先级排）
+## 4. 优化方向
 
-1. **把 `/chat` 和 `app.py` 的检索从纯向量换成 Hybrid** — 这是立即可做的，评估通常会证明 Hybrid 比 Baseline 好在 precision + recall。
-   - 改 `src/api/main.py` 的 `/chat` 端点
+1. ✅ **Hybrid+Reranker 已证实最优** — Day 40 落地：把 `/chat` 和 `app.py` 从纯向量升级到 Hybrid+Reranker。
+   - 改 `src/api/main.py` 的 `/chat` 和 `/chat/stream` 端点
    - 改 `app.py` 的 Streamlit 检索逻辑
-   - 需要先建一个持久的 VectorStore（不能每次都 delete_collection）
+   - 构建持久 VectorStore（不能每次都 delete_collection）
 
-2. **调 chunk_size** — 如果 recall 偏低，说明块太细碎；如果 precision 偏低，说明块太稀。当前 300 字/chunk 是一个经验起点，需要根据实际得分微调。
+2. **调 chunk_size** — precision 0.53 还有提升空间。当前 300 字/chunk，可以尝试 500 字/chunk 看是否提升 recall。
 
-3. **优化 System Prompt** — 如果 faithfulness 偏低（LLM 在编），检查 System Prompt 是否足够强调"不知道就说不知道"。
+3. **优化 System Prompt** — faithfulness 0.63（Hybrid+Rerank 下），检查 Prompt 是否足够强调"不知道就说不知道"。
 
-4. **加评估自动化** — 每次改检索策略或 chunk_size 后都跑一次 `test_ragas_eval.py`，形成"改 → 测 → 看分数"的好习惯。
+4. **加评估自动化** — 每次改检索或 chunk_size 后跑 `test_ragas_eval.py`，形成"改 → 测 → 看分数"习惯。
 
 ---
 
@@ -88,4 +87,4 @@ _以下为填写模板，拿到分数后逐一检查。_
 
 ## 6. 给面试准备的"一句话版本"
 
-> "我在自己的 RAG 项目上做了 RAGAS 评估，用 20 条标注数据横向对比了三种检索策略。Hybrid+Reranker 在 precision（0.53）和 recall（0.73）上全面领先纯向量（0.40 / 0.68），faithfulness 方面 Hybrid 最高（0.71）。用客观指标驱动优化，不是凭感觉改参数。"
+> "在知识库 RAG 项目上做了量化评估。用 20 条标注数据横向对比三种检索策略，Hybrid+Reranker 在 precision（0.53 vs 0.40，+35%）和 recall（0.73 vs 0.68，+7%）全面领先纯向量。核心架构是粗召（向量+BM25+RRF）→ 精排（bge-reranker），用数据驱动决策，不是凭感觉调参。"

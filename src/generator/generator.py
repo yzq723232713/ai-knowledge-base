@@ -91,3 +91,53 @@ class Generator:
         for chunk in stream:
             if chunk.choices[0].delta.content:
                 yield chunk.choices[0].delta.content
+
+    def generate_with_history(
+        self,
+        question: str,
+        contexts: list[str],
+        sources: list[str] = None,
+        history: list[dict] | None = None,
+    ) -> str:
+        """多轮对话：拼接历史消息 → LLM 生成（非流式）"""
+        refs = []
+        for i, ctx in enumerate(contexts):
+            src = sources[i] if sources and i < len(sources) else "未知来源"
+            refs.append(f"【参考{i+1}·来源: {src}】\n{ctx}")
+        context_block = "\n\n".join(refs)
+
+        messages = [{"role": "system", "content": self.system_prompt}]
+        if history:
+            messages.extend(history[-10:])  # 最近 10 轮
+        messages.append({"role": "user", "content": f"参考资料：\n{context_block}\n\n问题：{question}"})
+
+        resp = self.client.chat.completions.create(
+            model=self.model, messages=messages, temperature=0.0,
+        )
+        return resp.choices[0].message.content
+
+    def generate_stream_with_history(
+        self,
+        question: str,
+        contexts: list[str],
+        sources: list[str] = None,
+        history: list[dict] | None = None,
+    ):
+        """多轮对话：流式版本"""
+        refs = []
+        for i, ctx in enumerate(contexts):
+            src = sources[i] if sources and i < len(sources) else "未知来源"
+            refs.append(f"【参考{i+1}·来源: {src}】\n{ctx}")
+        context_block = "\n\n".join(refs)
+
+        messages = [{"role": "system", "content": self.system_prompt}]
+        if history:
+            messages.extend(history[-10:])
+        messages.append({"role": "user", "content": f"参考资料：\n{context_block}\n\n问题：{question}"})
+
+        stream = self.client.chat.completions.create(
+            model=self.model, messages=messages, temperature=0.0, stream=True,
+        )
+        for chunk in stream:
+            if chunk.choices[0].delta.content:
+                yield chunk.choices[0].delta.content

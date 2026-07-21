@@ -14,6 +14,8 @@ from src.loader.document_loader import DocumentLoader
 from src.chunker.text_splitter import TextSplitter
 from src.embedder.embedder import Embedder
 from src.retriever.vector_store import VectorStore
+from src.retriever.hybrid_retriever import HybridRetriever
+from src.retriever.reranker import Reranker
 from src.generator.generator import Generator
 
 # ===== 初始化 =====
@@ -24,6 +26,10 @@ def init_components():
         "splitter": TextSplitter(chunk_size=300, chunk_overlap=50),
         "embedder": Embedder(),
         "store": VectorStore(collection_name="streamlit_kb"),
+        "hybrid": HybridRetriever(
+            Embedder(), VectorStore(collection_name="streamlit_kb")
+        ),
+        "reranker": Reranker(),
         "generator": Generator(),
     }
 
@@ -32,7 +38,16 @@ loader = comp["loader"]
 splitter = comp["splitter"]
 embedder = comp["embedder"]
 store = comp["store"]
+hybrid = comp["hybrid"]
+hybrid.store = store  # 确保 hybrid 和 store 用同一个 collection
+reranker = comp["reranker"]
 generator = comp["generator"]
+
+# 文档数据缓存（用于重建 Hybrid 索引）
+if "_doc_texts" not in st.session_state:
+    st.session_state._doc_texts = []
+    st.session_state._doc_embeddings = []
+    st.session_state._doc_metas = []
 
 # ===== UI =====
 st.set_page_config(page_title="知识库问答", layout="wide")
@@ -62,6 +77,14 @@ with st.sidebar:
                 vecs = embedder.embed(texts).tolist()
                 metas = [{"source": c.source, "chunk_index": c.index} for c in chunks]
                 store.add(documents=texts, embeddings=vecs, metadatas=metas)
+                st.session_state._doc_texts.extend(texts)
+                st.session_state._doc_embeddings.extend(vecs)
+                st.session_state._doc_metas.extend(metas)
+                hybrid.index(
+                    st.session_state._doc_texts,
+                    st.session_state._doc_embeddings,
+                    st.session_state._doc_metas,
+                )
                 st.success(f"✅ {f.name} → {len(chunks)} 块")
             finally:
                 Path(tmp_path).unlink(missing_ok=True)
@@ -80,33 +103,68 @@ with st.sidebar:
             for src, cnt in seen.items():
                 st.write(f"📄 {src} ({cnt} 块)")
 
-# --- 主体：问答区 ---
-st.header("💬 智能问答")
-question = st.text_input("输入你的问题", placeholder="例如：设备怎么安装？")
+# --- 主体：多轮问答区 ---
+st.header("💬 智能问答（多轮对话）")
 
-col1, col2 = st.columns(2)
+col1, col2 = st.sidebar.columns(2)
 with col1:
-    top_k = st.slider("检索块数", 1, 10, 3)
+    top_k = st.sidebar.slider("检索块数", 1, 10, 3)
 with col2:
-    use_stream = st.checkbox("流式输出", value=True)
+    use_stream = st.sidebar.checkbox("流式输出", value=True)
 
-if st.button("🔍 提问") and question:
+# 初始化会话历史
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
+# 渲染历史消息
+for msg in st.session_state.messages:
+    with st.chat_message(msg["role"]):
+        st.write(msg["content"])
+
+# 用户输入
+question = st.chat_input("输入你的问题", key="chat_input")
+if question:
+    # 加用户消息
+    st.session_state.messages.append({"role": "user", "content": question})
+    with st.chat_message("user"):
+        st.write(question)
+
     # 检索
-    q_emb = embedder.embed_query(question).tolist()
-    docs, metas, _ = store.search(q_emb, top_k=top_k)
-    sources = [m.get("source", "") for m in metas]
-
-    # 显示检索结果
-    with st.expander("📋 检索到的参考资料", expanded=False):
-        for i, (d, s) in enumerate(zip(docs, sources)):
-            st.markdown(f"**参考{i+1} · {s}**")
-            st.text(d[:200] + ("..." if len(d) > 200 else ""))
-
-    # 生成回答
-    with st.chat_message("assistant"):
-        if use_stream:
-            response_stream = generator.generate_stream(question, docs, sources)
-            st.write_stream(response_stream)
+    if st.session_state._doc_texts:
+        coarse_k = min(top_k * 3, len(st.session_state._doc_texts))
+        results = hybrid.hybrid_search(question, top_k=coarse_k)
+        if results:
+            cands = [r[0] for r in results]
+            ranked = reranker.rerank(question, cands, top_k=top_k)
+            docs = [r[0] for r in ranked]
+            sources = []
+            for d in docs:
+                try:
+                    idx = st.session_state._doc_texts.index(d)
+                    sources.append(st.session_state._doc_metas[idx].get("source", ""))
+                except ValueError:
+                    sources.append("未知")
         else:
-            answer = generator.generate(question, docs, sources)
+            docs, sources = [], []
+    else:
+        docs, sources = [], []
+
+    # 生成（带历史）
+    with st.chat_message("assistant"):
+        history = [
+            {"role": m["role"], "content": m["content"]}
+            for m in st.session_state.messages[:-1]  # 不包括刚加的最新问题
+        ]
+        if use_stream:
+            response_stream = generator.generate_stream_with_history(
+                question, docs, sources, history=history,
+            )
+            answer = st.write_stream(response_stream)
+        else:
+            answer = generator.generate_with_history(
+                question, docs, sources, history=history,
+            )
             st.write(answer)
+
+    # 保存回答
+    st.session_state.messages.append({"role": "assistant", "content": answer})
